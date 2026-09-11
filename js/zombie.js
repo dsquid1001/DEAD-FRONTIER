@@ -1,1 +1,7 @@
-
+export class Zombie {
+  constructor(THREE, scene, position, player, onHitPlayer){this.THREE=THREE;this.scene=scene;this.player=player;this.onHitPlayer=onHitPlayer;this.hp=100;this.dead=false;this.speed=.9+Math.random()*.45;this.attackTimer=0;this.group=new THREE.Group();this.build();this.group.position.copy(position);scene.add(this.group)}
+  build(){const T=this.THREE,m=new T.MeshStandardMaterial({color:0x58635a,flatShading:true}),skin=new T.MeshStandardMaterial({color:0x8b9a87,flatShading:true}),head=new T.Mesh(new T.IcosahedronGeometry(.28,0),skin);head.position.y=1.65;this.group.add(head);const body=new T.Mesh(new T.BoxGeometry(.55,.85,.35),m);body.position.y=1.05;this.group.add(body);for(const s of[-1,1]){const arm=new T.Mesh(new T.BoxGeometry(.18,.75,.18),skin);arm.position.set(s*.4,1.05,0);arm.rotation.z=s*.18;this.group.add(arm);const leg=new T.Mesh(new T.BoxGeometry(.2,.7,.2),m);leg.position.set(s*.16,.45,0);this.group.add(leg)}this.group.userData.zombie=this}
+  takeDamage(n){if(this.dead)return;this.hp-=n;if(this.hp<=0)this.die()}
+  die(){this.dead=true;this.scene.remove(this.group)}
+  update(dt){if(this.dead)return;const p=this.player.position,g=this.group.position,dx=p.x-g.x,dz=p.z-g.z,d=Math.hypot(dx,dz);if(d>1.35){const step=this.speed*dt;g.x+=dx/d*step;g.z+=dz/d*step;this.group.rotation.y=Math.atan2(dx,dz)}else{this.attackTimer-=dt;if(this.attackTimer<=0){this.attackTimer=1.1;this.onHitPlayer(8)}}}
+}
